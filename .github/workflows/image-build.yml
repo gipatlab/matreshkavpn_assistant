@@ -17,10 +17,12 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Push to GitHub Packages
-        uses: docker/build-push-action@v2
+        uses: docker/build-push-action@v1
         with:
           username: ${{ github.actor }}
-          password: 88dtwGb&11175087
+          password: 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
           registry: docker.pkg.github.com
           repository: gipatlab/matreshkavpn_assistant/matreshkavpn_assistant
           tag_with_ref: true
+
+#docker pull ghcr.io/gipatlab/matreshkavpn_assistant/matreshkavpn_assistant:main
