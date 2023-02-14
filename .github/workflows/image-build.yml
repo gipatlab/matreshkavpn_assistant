@@ -24,5 +24,3 @@ jobs:
           registry: docker.pkg.github.com
           repository: gipatlab/matreshkavpn_assistant/matreshkavpn_assistant
           tag_with_ref: true
-
-#docker pull ghcr.io/gipatlab/matreshkavpn_assistant/matreshkavpn_assistant:main

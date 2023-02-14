@@ -1,11 +1,9 @@
-import json
 import os
 from loguru import logger
 import pandas as pd
 import numpy as np
 import tiktoken
 import openai
-from flask import Flask, Response, request
 
 class MatreshkaAssistant:
   def __init__(
@@ -28,12 +26,16 @@ class MatreshkaAssistant:
       "temperature": TEMPERATURE,
       "max_tokens": MAX_TOKENS,
       "model": COMPLETIONS_MODEL,
+      "frequency_penalty": 0,
+      "presence_penalty": 0,
+      "top_p": 1
     }
     self.dataset_path = dataset_path
     self.data_frame = None
     self.encoding = tiktoken.get_encoding(encoding_name=self.ENCODING)
     self.separator_len = len(tiktoken.get_encoding(encoding_name=ENCODING).encode(text=SEPARATOR))
     self.document_embeddings = None
+    self.type_q = "!general_survey"
 
     logger.info(f"Context separator contains {self.separator_len} tokens")
 
@@ -133,11 +135,12 @@ class MatreshkaAssistant:
     logger.info(f"Selected {len(chosen_sections)} document sections:")
     logger.info("\n".join(chosen_sections_indexes))
 
-    prompt_header = "Ответь на вопрос как можно правдивее, используя предоставленный контекст, и если ответ не содержится в приведенном ниже тексте, скажите \"Я не знаю ответ на этот вопрос.\""
+    prompt_header = f"Ответь на вопрос как можно правдивее, используя предоставленный контекст, и если ответ не содержится в приведенном ниже тексте, скажите \"Я не знаю ответ на этот вопрос.\""
 
     header = f"""{prompt_header}\n\nContext:\n"""
 
     return header + "".join(chosen_sections) + "\n\n Q: " + prompt + "\n A:"
+
 
   def ask(
           self,
@@ -166,42 +169,15 @@ class MatreshkaAssistant:
       **self.COMPLETIONS_API_PARAMS
     )
 
-    return response["choices"][0]["text"].strip(" \n")
+    answer = response["choices"][0]["text"].strip(" \n")
 
+    # if answer == self.type_q:
+    #   response = openai.Completion.create(
+    #     prompt=query,
+    #     **self.COMPLETIONS_API_PARAMS
+    #   )
+    #   answer = response["choices"][0]["text"].strip(" \n")
 
-class App:
-  app = None
-  host = None
-  port = None
+    logger.info(response)
 
-  def __init__(self, app, assistant: MatreshkaAssistant, host: str = os.environ.get("HOST"), port: int = int(os.environ.get("PORT"))):
-    self.host = host
-    self.port = port
-    self.app = Flask(app)
-    self.app.config["assistant"] = assistant
-
-  def run(self):
-    self.app.run(host=self.host, port=self.port, debug=True, threaded=True)
-
-  def add_repo(self, methods=None, endpoint=None, name=None, handler=None):
-    self.app.add_url_rule(endpoint=name, rule=endpoint, view_func=handler, methods=methods)
-
-
-class Repository:
-  def __init__(self, app: App):
-    self.app = app
-
-  def message(self):
-    try:
-      message = request.get_json()["message"]
-    except:
-      return Response(status=400, response=json.dumps({"error": "Parameter message is required."}), mimetype="application/json")
-
-    try:
-      assistant = self.app.app.config["assistant"]
-
-      response = assistant.ask(message, assistant.dataset_path, assistant.document_embeddings)
-
-      return Response(status=200, response=json.dumps({"message": response}), mimetype="application/json")
-    except:
-      return Response(status=500, response=json.dumps({"error": "Something went wrong, try again later."}), mimetype="application/json")
+    return answer
