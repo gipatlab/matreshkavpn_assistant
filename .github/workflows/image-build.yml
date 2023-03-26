@@ -24,3 +24,5 @@ jobs:
           registry: docker.pkg.github.com
           repository: gipatlab/matreshkavpn_assistant/matreshkavpn_assistant
           tag_with_ref: true
+
+#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
