@@ -176,6 +176,14 @@ class MatreshkaAssistant:
 
     answer = response["choices"][0]["text"].strip(" \n")
 
+    if answer == "Я не знаю ответ на этот вопрос.":
+      response = openai.ChatCompletion.create(model="gpt-4", messages=[
+
+        {"role": "user", "content": query}
+      ])
+      answer = response["choices"][0]["text"].strip(" \n")
+
+
     # if answer == self.type_q:
     #   response = openai.Completion.create(
     #     prompt=query,
