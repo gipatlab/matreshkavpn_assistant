@@ -20,7 +20,7 @@ jobs:
         uses: docker/build-push-action@v1
         with:
           username: ${{ github.actor }}
-          password: 88dtwGb&11175087
+          password: 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
           registry: docker.pkg.github.com
           repository: gipatlab/matreshkavpn_assistant/matreshkavpn_assistant
           tag_with_ref: true
