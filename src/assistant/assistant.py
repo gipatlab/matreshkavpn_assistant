@@ -164,10 +164,15 @@ class MatreshkaAssistant:
     if show_prompt:
       logger.info(prompt)
 
-    response = openai.Completion.create(
-      prompt=prompt,
-      **self.COMPLETIONS_API_PARAMS
-    )
+    # response = openai.Completion.create(
+    #   prompt=prompt,
+    #   **self.COMPLETIONS_API_PARAMS
+    # )
+
+    response = openai.ChatCompletion.create(model="gpt-4", messages=[
+
+      {"role": "user", "content": prompt}
+    ])
 
     answer = response["choices"][0]["text"].strip(" \n")
 

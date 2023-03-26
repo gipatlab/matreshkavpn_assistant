@@ -14,12 +14,21 @@ class Repository:
       message = request.get_json()["message"]
     except:
       return Response(status=400, response=Error("Parameter message is required.").__json__(), mimetype="application/json")
+    try:
+      lastMessages = request.get_json()["lastMessages"]
+    except:
+      return Response(status=400, response=Error("Parameter message is required.").__json__(), mimetype="application/json")
+
 
 
     try:
       assistant = self.app.app.config["assistant"]
 
-      response = Message(assistant.ask(message, assistant.dataset_path, assistant.document_embeddings)).__json__()
+      userMessage = Message(message["id"], message["message"], message["createdAt"], message["state"], message["fromAssistant"])
+
+      print(userMessage)
+
+      response = ""# Message(assistant.ask(message, assistant.dataset_path, assistant.document_embeddings)).__json__()
 
       return Response(status=200, response=response, mimetype="application/json")
     except:
